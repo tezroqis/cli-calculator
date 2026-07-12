@@ -1,3 +1,5 @@
+# create a calc
+
 def add(a, b):
     return a + b
 
@@ -26,6 +28,7 @@ operations = {
 
 def main():
     print("=== CLI Калькулятор ===")
+
 
     while True:
         print("\nДоступные операции: +  -  *  /")
