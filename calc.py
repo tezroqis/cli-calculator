@@ -14,7 +14,7 @@ def multiply(a, b):
 
 def divide(a, b):
     if b == 0:
-        raise ValueError("Деление на ноль невозможно.")
+        raise ZeroDivisionError("Деление на ноль невозможно.")
     return a / b
 
 
@@ -29,12 +29,11 @@ operations = {
 def main():
     print("=== CLI Калькулятор ===")
 
-
     while True:
         print("\nДоступные операции: +  -  *  /")
         operation = input("Введите операцию (или 'q' для выхода): ").strip()
 
-        if operation.lower() == "q":
+        if operation.lower() == "q" or operation.lower() == "quit":
             print("До свидания!")
             break
 
@@ -49,9 +48,14 @@ def main():
             result = operations[operation](num1, num2)
             print(f"Результат: {result}")
 
-        except ValueError as error:
+        except ValueError:
+            print("Ошибка: некорректное число. Попробуйте снова.")
+        except ZeroDivisionError as error:
             print(f"Ошибка: {error}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (KeyboardInterrupt, EOFError):
+        print("\nДо свидания!")
