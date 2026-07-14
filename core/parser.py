@@ -39,6 +39,7 @@ def parse(tokens: list[Token]) -> list[Token]:
     """
     output: list[Token] = []
     operator_stack: list[Token] = []
+    arg_count_stack: list[int] = []
     prev_token: Token | None = None
 
     def _is_unary_minus(idx: int) -> bool:
@@ -69,6 +70,7 @@ def parse(tokens: list[Token]) -> list[Token]:
         elif token.type == TokenType.FUNCTION:
             # Функции отправляются в стек
             operator_stack.append(token)
+            arg_count_stack.append(1)
 
         elif token.type == TokenType.OPERATOR:
             # Пока на вершине стека оператор с большим приоритетом
@@ -110,7 +112,10 @@ def parse(tokens: list[Token]) -> list[Token]:
 
             # Если перед скобкой была функция — выталкиваем её
             if operator_stack and operator_stack[-1].type == TokenType.FUNCTION:
-                output.append(operator_stack.pop())
+                func_token = operator_stack.pop()
+                if arg_count_stack:
+                    func_token.arg_count = arg_count_stack.pop()
+                output.append(func_token)
 
         elif token.type == TokenType.COMMA:
             # Выталкиваем до открывающей скобки (разделитель аргументов)
@@ -119,6 +124,11 @@ def parse(tokens: list[Token]) -> list[Token]:
 
             if not operator_stack:
                 raise ParserError("Запятая вне вызова функции")
+
+            # Увеличиваем счётчик аргументов для текущей функции
+            # (arg_count_stack содержит счётчики только для функций, не для скобок)
+            if arg_count_stack:
+                arg_count_stack[-1] += 1
 
         prev_token = token
         i += 1

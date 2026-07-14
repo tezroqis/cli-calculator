@@ -28,11 +28,12 @@ class Associativity(Enum):
 class Token:
     """Токен математического выражения."""
 
-    __slots__ = ("type", "value")
+    __slots__ = ("type", "value", "arg_count")
 
-    def __init__(self, type: TokenType, value: float | str) -> None:
+    def __init__(self, type: TokenType, value: float | str, arg_count: int = 1) -> None:
         self.type: TokenType = type
         self.value: float | str = value
+        self.arg_count: int = arg_count
 
     def __repr__(self) -> str:
         return f"Token({self.type.name}, {self.value!r})"

@@ -81,32 +81,48 @@ def evaluate(rpn: list[Token]) -> float:
                 continue
 
             # Функции без аргументов (константы обрабатываются выше)
-            # Все остальные функции требуют ровно одного аргумента
-            if not stack:
-                raise EvaluatorError(f"Недостаточно операндов для функции {func_name}")
+            # Определяем, сколько аргументов нужно функции
+            arg_count = token.arg_count
 
-            a = stack.pop()
-
-            if func_name == "sqrt":
-                stack.append(sqrt(a))
-            elif func_name == "abs":
-                stack.append(absolute(a))
-            elif func_name == "sin":
-                stack.append(sin(a))
-            elif func_name == "cos":
-                stack.append(cos(a))
-            elif func_name == "tan":
-                stack.append(tan(a))
-            elif func_name == "ln":
-                stack.append(natural_log(a))
-            elif func_name == "log":
-                stack.append(logarithm(a))
-            elif func_name == "round":
-                stack.append(round_value(a))
-            elif func_name == "factorial":
-                stack.append(factorial(a))
+            if func_name in ("round", "log"):
+                # Эти функции могут принимать 1 или 2 аргумента
+                if len(stack) >= 2 and arg_count >= 2:
+                    b = stack.pop()
+                    a = stack.pop()
+                    if func_name == "round":
+                        stack.append(round_value(a, int(b)))
+                    else:  # log
+                        stack.append(logarithm(a, b))
+                elif len(stack) >= 1:
+                    a = stack.pop()
+                    if func_name == "round":
+                        stack.append(round_value(a))
+                    else:  # log
+                        stack.append(logarithm(a))
+                else:
+                    raise EvaluatorError(f"Недостаточно операндов для функции {func_name}")
             else:
-                raise EvaluatorError(f"Неизвестная функция: {func_name}")
+                if not stack:
+                    raise EvaluatorError(f"Недостаточно операндов для функции {func_name}")
+
+                a = stack.pop()
+
+                if func_name == "sqrt":
+                    stack.append(sqrt(a))
+                elif func_name == "abs":
+                    stack.append(absolute(a))
+                elif func_name == "sin":
+                    stack.append(sin(a))
+                elif func_name == "cos":
+                    stack.append(cos(a))
+                elif func_name == "tan":
+                    stack.append(tan(a))
+                elif func_name == "ln":
+                    stack.append(natural_log(a))
+                elif func_name == "factorial":
+                    stack.append(factorial(a))
+                else:
+                    raise EvaluatorError(f"Неизвестная функция: {func_name}")
 
         elif token.type == TokenType.OPERATOR:
             op = str(token.value)
